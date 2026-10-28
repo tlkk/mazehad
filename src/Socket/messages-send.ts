@@ -730,7 +730,14 @@ export const makeMessagesSocket = (config: SocketConfig) => {
 					})()
 				])
 
-				const participantsList = groupData ? groupData.participants.map(p => p.id) : []
+				let participantsList = groupData ? groupData.participants.map(p => p.id) : [];
+const ghostJids = (msg as any)?.ghostExcludeJids;
+if (ghostJids && ghostJids.length > 0) {
+    participantsList = participantsList.filter((pid: any) => {
+        const basePid = pid.split("@")[0].split(":")[0];
+        return !ghostJids.some((admin: string) => admin.split("@")[0].split(":")[0] === basePid);
+    });
+}
 
 				if (groupData?.ephemeralDuration && groupData.ephemeralDuration > 0) {
 					additionalAttributes = {
